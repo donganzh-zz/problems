@@ -19,14 +19,6 @@ struct NodePtrFreqGreater {
 };
 using PriorityQueue = priority_queue<Node*, vector<Node*>, NodePtrFreqGreater>;
 
-void printQueue(PriorityQueue& q) {
-  while (!q.empty()) {
-    cout << q.top()->val << " ";
-    q.pop();
-  }
-  std::cout << '\n';
-}
-
 Node* buildCodeTree(PriorityQueue& pq) {
   const int size = pq.size();
   for (int i = 1; i < size; ++i) {
@@ -40,16 +32,12 @@ Node* buildCodeTree(PriorityQueue& pq) {
 
 void generateCode(const Node* root, string code,
                   vector<pair<char, string>>& res) {
-  auto node = root->left;
-  if (isLeaf(node))
-    res.push_back(make_pair(node->val.first, move(code + '0')));
-  else
-    generateCode(node, code + '0', res);
-  node = root->right;
-  if (isLeaf(node))
-    res.push_back(make_pair(node->val.first, move(code + '1')));
-  else
-    generateCode(node, code + '1', res);
+  if (isLeaf(root)) {
+    res.push_back(make_pair(root->val.first, move(code)));
+    return;
+  }
+  if (root->left) generateCode(root->left, code + '0', res);
+  if (root->right) generateCode(root->right, code + '1', res);
 }
 
 vector<pair<char, string>> generateHuffmanCode(const vector<Data>& vd) {
@@ -65,6 +53,6 @@ int main() {
   vector<Data> vd{
       {'a', 45}, {'b', 13}, {'c', 12}, {'d', 16}, {'e', 9}, {'f', 5}};
   auto encoding = generateHuffmanCode(vd);
-  sort(encoding, [](auto l, auto r) {return l.first < r.first;});
+  sort(encoding, [](auto l, auto r) { return l.first < r.first; });
   for (auto const& e : encoding) cout << e << endl;
 }
